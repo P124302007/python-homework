@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通信系统仿真平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app">
+    <header>
+        <h1>通信系统仿真平台</h1>
+        <span class="subtitle">基于 CommPy 的数字通信链路仿真</span>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-tab="ber">BER 分析</button>
+        <button class="tab" data-tab="constellation">星座图</button>
+        <button class="tab" data-tab="eye">眼图</button>
+        <button class="tab" data-tab="waveform">信号波形</button>
+    </nav>
+
+    <main>
+        <!-- ========== BER 分析 ========== -->
+        <div class="panel active" id="panel-ber">
+            <aside class="controls">
+                <fieldset>
+                    <legend>调制方式</legend>
+                    <label><input type="checkbox" name="mod" value="BPSK" checked> BPSK</label>
+                    <label><input type="checkbox" name="mod" value="QPSK" checked> QPSK</label>
+                    <label><input type="checkbox" name="mod" value="8PSK"> 8PSK</label>
+                    <label><input type="checkbox" name="mod" value="16QAM" checked> 16QAM</label>
+                    <label><input type="checkbox" name="mod" value="64QAM"> 64QAM</label>
+                </fieldset>
+                <fieldset>
+                    <legend>信道模型</legend>
+                    <label><input type="radio" name="ber-ch" value="AWGN" checked> AWGN</label>
+                    <label><input type="radio" name="ber-ch" value="Rayleigh"> Rayleigh 衰落</label>
+                </fieldset>
+                <fieldset>
+                    <legend>信道编码</legend>
+                    <label><input type="radio" name="ber-coding" value="none" checked> 无编码</label>
+                    <label><input type="radio" name="ber-coding" value="conv"> 卷积码 (2,1,2)</label>
+                </fieldset>
+                <fieldset>
+                    <legend>Eb/N0 范围 (dB)</legend>
+                    <div class="input-row">
+                        <label>起始<input type="number" id="snr-start" value="0" step="1"></label>
+                        <label>终止<input type="number" id="snr-end" value="20" step="1"></label>
+                        <label>步长<input type="number" id="snr-step" value="1" step="0.5" min="0.5"></label>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>仿真参数</legend>
+                    <label>比特数<input type="number" id="num-bits" value="50000" step="10000" min="10000"></label>
+                </fieldset>
+                <label class="check-row">
+                    <input type="checkbox" id="show-theo" checked>
+                    <span>叠加理论曲线</span>
+                </label>
+                <button id="btn-ber" class="btn-primary">开始仿真</button>
+            </aside>
+            <div class="chart-area">
+                <div id="chart-ber" class="chart"></div>
+                <div class="loading" id="loading-ber">仿真计算中...</div>
+            </div>
+        </div>
+
+        <!-- ========== 星座图 ========== -->
+        <div class="panel" id="panel-constellation">
+            <aside class="controls">
+                <fieldset>
+                    <legend>调制方式</legend>
+                    <select id="const-mod">
+                        <option value="BPSK">BPSK</option>
+                        <option value="QPSK" selected>QPSK</option>
+                        <option value="8PSK">8PSK</option>
+                        <option value="16QAM">16QAM</option>
+                        <option value="64QAM">64QAM</option>
+                    </select>
+                </fieldset>
+                <fieldset>
+                    <legend>信道模型</legend>
+                    <label><input type="radio" name="const-ch" value="AWGN" checked> AWGN</label>
+                    <label><input type="radio" name="const-ch" value="Rayleigh"> Rayleigh 衰落</label>
+                </fieldset>
+                <fieldset>
+                    <legend>Eb/N0: <span class="mono" id="const-snr-val">10</span> dB</legend>
+                    <input type="range" id="const-snr" min="-5" max="30" value="10" step="1">
+                </fieldset>
+                <button id="btn-const" class="btn-primary">生成星座图</button>
+            </aside>
+            <div class="chart-area">
+                <div id="chart-constellation" class="chart"></div>
+                <div class="loading" id="loading-constellation">生成中...</div>
+            </div>
+        </div>
+
+        <!-- ========== 眼图 ========== -->
+        <div class="panel" id="panel-eye">
+            <aside class="controls">
+                <fieldset>
+                    <legend>调制方式</legend>
+                    <select id="eye-mod">
+                        <option value="BPSK" selected>BPSK</option>
+                        <option value="QPSK">QPSK</option>
+                        <option value="8PSK">8PSK</option>
+                        <option value="16QAM">16QAM</option>
+                        <option value="64QAM">64QAM</option>
+                    </select>
+                </fieldset>
+                <fieldset>
+                    <legend>信道模型</legend>
+                    <label><input type="radio" name="eye-ch" value="AWGN" checked> AWGN</label>
+                    <label><input type="radio" name="eye-ch" value="Rayleigh"> Rayleigh 衰落</label>
+                </fieldset>
+                <fieldset>
+                    <legend>Eb/N0: <span class="mono" id="eye-snr-val">10</span> dB</legend>
+                    <input type="range" id="eye-snr" min="-5" max="30" value="10" step="1">
+                </fieldset>
+                <button id="btn-eye" class="btn-primary">生成眼图</button>
+            </aside>
+            <div class="chart-area">
+                <div id="chart-eye" class="chart"></div>
+                <div class="loading" id="loading-eye">生成中...</div>
+            </div>
+        </div>
+
+        <!-- ========== 信号波形 ========== -->
+        <div class="panel" id="panel-waveform">
+            <aside class="controls">
+                <fieldset>
+                    <legend>调制方式</legend>
+                    <select id="wf-mod">
+                        <option value="BPSK" selected>BPSK</option>
+                        <option value="QPSK">QPSK</option>
+                        <option value="8PSK">8PSK</option>
+                        <option value="16QAM">16QAM</option>
+                        <option value="64QAM">64QAM</option>
+                    </select>
+                </fieldset>
+                <fieldset>
+                    <legend>信道模型</legend>
+                    <label><input type="radio" name="wf-ch" value="AWGN" checked> AWGN</label>
+                    <label><input type="radio" name="wf-ch" value="Rayleigh"> Rayleigh 衰落</label>
+                </fieldset>
+                <fieldset>
+                    <legend>Eb/N0: <span class="mono" id="wf-snr-val">10</span> dB</legend>
+                    <input type="range" id="wf-snr" min="-5" max="30" value="10" step="1">
+                </fieldset>
+                <button id="btn-wf" class="btn-primary">生成波形</button>
+            </aside>
+            <div class="chart-area">
+                <div id="chart-waveform" class="chart"></div>
+                <div class="loading" id="loading-waveform">生成中...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
